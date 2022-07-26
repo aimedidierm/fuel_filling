@@ -4,6 +4,32 @@ ini_set('display_startup_errors',1);
 error_reporting(E_ALL);
 require '../php-includes/connect.php';
 require 'php-includes/check-login.php';
+$sql = "SELECT * FROM seller WHERE email = ?";
+$stmt = $db->prepare($sql);
+$stmt->execute(array($_SESSION['email']));
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+$myid = $row['id'];
+
+$sql = "SELECT * FROM transactions WHERE seller = ?";
+$stmt = $db->prepare($sql);
+$stmt->execute(array($myid));
+$trnumb=$stmt->rowCount();
+
+$sql = "SELECT * FROM user";
+$stmt = $db->prepare($sql);
+$stmt->execute();
+$users=$stmt->rowCount();
+
+$sql = "SELECT * FROM consume WHERE seller= ?";
+$stmt = $db->prepare($sql);
+$stmt->execute(array($myid));
+$bonus=$stmt->rowCount();
+
+$sql = "SELECT SUM(debit) FROM transactions WHERE seller = ?";
+$stmt = $db->prepare($sql);
+$stmt->execute(array($myid));
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+$sales=$row['SUM(debit)'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +54,51 @@ require 'php-includes/check-login.php';
 </head>
 
 <body class="g-sidenav-show  bg-gray-200">
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">
+        <span class="ms-1 font-weight-bold text-white">Seller</span>
+      </a>
+    </div>
+    <hr class="horizontal light mt-0 mb-2">
+    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link text-white active bg-gradient-primary" href="dashboard.php">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">dashboard</i>
+            </div>
+            <span class="nav-link-text ms-1">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white " href="sub.php">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">receipt_long</i>
+            </div>
+            <span class="nav-link-text ms-1">Bonus</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white " href="transactions.php">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">table_view</i>
+            </div>
+            <span class="nav-link-text ms-1">Transactions</span>
+          </a>
+        </li>
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages</h6>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white " href="settings.php">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">person</i>
+            </div>
+            <span class="nav-link-text ms-1">Profile</span>
+          </a>
+        </li>
   <?php require 'php-includes/nav.php';?>
     <div class="container-fluid py-4">
       <div class="row">
@@ -38,13 +109,9 @@ require 'php-includes/check-login.php';
                 <i class="material-icons opacity-10">weekend</i>
               </div>
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Today's Money</p>
-                <h4 class="mb-0">$53k</h4>
+                <p class="text-sm mb-0 text-capitalize">Total sales</p>
+                <h4 class="mb-0"><?php echo $sales;?> Rwf</h4>
               </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+55% </span>than last week</p>
             </div>
           </div>
         </div>
@@ -55,13 +122,9 @@ require 'php-includes/check-login.php';
                 <i class="material-icons opacity-10">person</i>
               </div>
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Today's Users</p>
-                <h4 class="mb-0">2,300</h4>
+                <p class="text-sm mb-0 text-capitalize">Total users</p>
+                <h4 class="mb-0"><?php echo $users;?></h4>
               </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+3% </span>than last month</p>
             </div>
           </div>
         </div>
@@ -72,13 +135,9 @@ require 'php-includes/check-login.php';
                 <i class="material-icons opacity-10">person</i>
               </div>
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">New Clients</p>
-                <h4 class="mb-0">3,462</h4>
+                <p class="text-sm mb-0 text-capitalize">Bonus</p>
+                <h4 class="mb-0"><?php echo $bonus;?></h4>
               </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">-2%</span> than yesterday</p>
             </div>
           </div>
         </div>
@@ -89,13 +148,9 @@ require 'php-includes/check-login.php';
                 <i class="material-icons opacity-10">weekend</i>
               </div>
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Sales</p>
-                <h4 class="mb-0">$103,430</h4>
+                <p class="text-sm mb-0 text-capitalize">Transactions</p>
+                <h4 class="mb-0"><?php echo $trnumb;?></h4>
               </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+5% </span>than yesterday</p>
             </div>
           </div>
         </div>
@@ -111,13 +166,7 @@ require 'php-includes/check-login.php';
               </div>
             </div>
             <div class="card-body">
-              <h6 class="mb-0 ">Website Views</h6>
-              <p class="text-sm ">Last Campaign Performance</p>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm"> campaign sent 2 days ago </p>
-              </div>
+              <h6 class="mb-0 ">Daily Sales</h6>
             </div>
           </div>
         </div>
@@ -131,13 +180,7 @@ require 'php-includes/check-login.php';
               </div>
             </div>
             <div class="card-body">
-              <h6 class="mb-0 "> Daily Sales </h6>
-              <p class="text-sm "> (<span class="font-weight-bolder">+15%</span>) increase in today sales. </p>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm"> updated 4 min ago </p>
-              </div>
+              <h6 class="mb-0 "> Users</h6>
             </div>
           </div>
         </div>
@@ -151,13 +194,7 @@ require 'php-includes/check-login.php';
               </div>
             </div>
             <div class="card-body">
-              <h6 class="mb-0 ">Completed Tasks</h6>
-              <p class="text-sm ">Last Campaign Performance</p>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm">just updated</p>
-              </div>
+              <h6 class="mb-0 ">Transactions</h6>
             </div>
           </div>
         </div>
