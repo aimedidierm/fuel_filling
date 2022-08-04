@@ -4,6 +4,27 @@ ini_set('display_startup_errors',1);
 error_reporting(E_ALL);
 require '../php-includes/connect.php';
 require 'php-includes/check-login.php';
+$query = "SELECT * FROM seller WHERE email= ? limit 1";
+$stmt = $db->prepare($query);
+$stmt->execute(array($_SESSION['email']));
+$rows = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($stmt->rowCount()>0) {
+    $myid=$rows['id'];
+    $balance=$rows['balance'];
+}
+if(isset($_POST['update'])){
+  $amount=$_POST['amount'];
+  if ($amount <= $balance){
+      $sql ="INSERT INTO pending_withdraw (seller, amount) VALUES (?,?)";
+      $stm = $db->prepare($sql);
+      if ($stm->execute(array($myid, $amount))) {
+          print "<script>alert('Your withdraw request send');window.location.assign('transactions.php')</script>";
+  
+      }
+  } else{
+      echo "<script>alert('Low balance');window.location.assign('transactions.php')</script>";
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -78,10 +99,20 @@ require 'php-includes/check-login.php';
 <div class="container-fluid py-4">
       <div class="row">
         <div class="col-12">
+          <h6>Request withdraw</h6>
+        <form method="post">
+            <div class="form-group">
+                <label>Amount:</label>
+                <input class="form-control" type="number" name="amount" required>
+            </div>
+            <div class="form-group">
+            <button type="submit" class="btn btn-success" name="update"> Request</button>
+            </div>
+        </form>
           <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                <h6 class="text-white text-capitalize ps-3">Customer consumes</h6>
+                <h6 class="text-white text-capitalize ps-3">Balance:<?php echo $balance;?>Rwf</h6>
               </div>
             </div>
             <div class="card-body px-0 pb-2">
@@ -99,13 +130,6 @@ require 'php-includes/check-login.php';
                   </thead>
                   <tbody>
                     <?php
-                    $query = "SELECT * FROM seller WHERE email= ? limit 1";
-                    $stmt = $db->prepare($query);
-                    $stmt->execute(array($_SESSION['email']));
-                    $rows = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if ($stmt->rowCount()>0) {
-                        $myid=$rows['id'];
-                    }
                     $query = "SELECT c.user,c.amount,c.total,c.seller,c.time,u.id,u.names,u.card FROM consume AS c JOIN user AS u ON c.user = u.id WHERE seller= ?";
                     $stmt = $db->prepare($query);
                     $stmt->execute(array($myid));

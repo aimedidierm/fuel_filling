@@ -15,10 +15,10 @@ $stmt = $db->prepare($sql);
 $stmt->execute();
 $users=$stmt->rowCount();
 
-$sql = "SELECT * FROM consume";
+$sql = "SELECT * FROM seller";
 $stmt = $db->prepare($sql);
 $stmt->execute();
-$bonus=$stmt->rowCount();
+$sellers=$stmt->rowCount();
 
 $sql = "SELECT SUM(debit) FROM transactions";
 $stmt = $db->prepare($sql);
@@ -86,8 +86,8 @@ $sales=$row['SUM(debit)'];
                 <i class="material-icons opacity-10">person</i>
               </div>
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Bonus</p>
-                <h4 class="mb-0"><?php echo $bonus;?></h4>
+                <p class="text-sm mb-0 text-capitalize">Total sellers</p>
+                <h4 class="mb-0"><?php echo $sellers;?></h4>
               </div>
             </div>
           </div>
