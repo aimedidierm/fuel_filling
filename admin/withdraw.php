@@ -64,7 +64,7 @@ require 'php-includes/check-login.php';
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div>
-                            <img src="../assets/img/team-2.jpg" class="avatar avatar-sm me-3 border-radius-lg" alt="user1">
+                            <img src="../assets/img/user.jpg" class="avatar avatar-sm me-3 border-radius-lg" alt="user1">
                           </div>
                           <div class="d-flex flex-column justify-content-center">
                             <h6 class="mb-0 text-sm"><?php echo $row['names'];?></h6>
@@ -88,6 +88,37 @@ require 'php-includes/check-login.php';
                     $count++;
                     }
                 }
+                if(isset($_POST['com'])){
+
+                  $query = "SELECT * FROM seller WHERE id= ? limit 1";
+                  $stmt = $db->prepare($query);
+                  $stmt->execute(array($seller));
+                  $rows = $stmt->fetch(PDO::FETCH_ASSOC);
+                  if ($stmt->rowCount()>0) {
+                      $balance=$rows['balance'];
+                  } 
+                  $newbalance=$balance-$namount;
+                  $sql ="UPDATE seller SET balance = ? WHERE id = ? limit 1";
+                  $stm = $db->prepare($sql);
+                  if ($stm->execute(array($newbalance,$seller))) {
+                      $sql ="DELETE FROM pending_withdraw WHERE id = ?";
+                      $stm = $db->prepare($sql);
+                      if ($stm->execute(array($sid))) {
+                          $sql ="INSERT INTO transactions (credit,seller) VALUES (?,?)";
+                          $stm = $db->prepare($sql);
+                          if ($stm->execute(array($namount,$seller))) {
+                              print "<script>alert('Comfirmed');window.location.assign('withdraw.php')</script>";
+                  
+                          } else {
+                              print "<script>alert('Fail');window.location.assign('withdraw.php')</script>";
+                          }
+                      } else {
+                          print "<script>alert('Fail');window.location.assign('withdraw.php')</script>";
+                      }
+                  } else {
+                      print "<script>alert('Fail');window.location.assign('withdraw.php')</script>";
+                  }
+              }
                 ?>
                   </tbody>
                 </table>
