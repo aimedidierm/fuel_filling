@@ -30,6 +30,29 @@ $stmt = $db->prepare($sql);
 $stmt->execute(array($myid));
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 $sales=$row['SUM(debit)'];
+
+if(isset($_POST['send'])){
+  $price=$_POST['price'];
+  $sql ="UPDATE price SET price = ? WHERE id = '1' limit 1";
+  $stm = $db->prepare($sql);
+  if ($stm->execute(array($price))) {
+      print "<script>alert('Price updated');window.location.assign('dashboard.php')</script>";
+
+  } else {
+  print "<script>alert('Fail');window.location.assign('dashboard.php')</script>";
+}
+}
+if(isset($_POST['set'])){
+  $price=$_POST['price'];
+  $sql ="UPDATE consume_allowed SET consume = ? WHERE id = '1' limit 1";
+  $stm = $db->prepare($sql);
+  if ($stm->execute(array($price))) {
+      print "<script>alert('Data updated');window.location.assign('dashboard.php')</script>";
+
+  } else {
+  print "<script>alert('Fail');window.location.assign('dashboard.php')</script>";
+}
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,6 +93,14 @@ $sales=$row['SUM(debit)'];
               <i class="material-icons opacity-10">dashboard</i>
             </div>
             <span class="nav-link-text ms-1">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="users.php">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">person</i>
+            </div>
+            <span class="nav-link-text ms-1">Users</span>
           </a>
         </li>
         <li class="nav-item">
@@ -156,48 +187,26 @@ $sales=$row['SUM(debit)'];
         </div>
       </div>
       <div class="row mt-4">
-        <div class="col-lg-4 col-md-6 mt-4 mb-4">
-          <div class="card z-index-2 ">
-            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-              <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
-                <div class="chart">
-                  <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <h6 class="mb-0 ">Daily Sales</h6>
-            </div>
-          </div>
+      <div class="card shadow mb-6">
+        <form method="post">
+        <div class="form-group">
+            <label>Enter update price per litter</label>
+            <input class="form-control" name="price">
         </div>
-        <div class="col-lg-4 col-md-6 mt-4 mb-4">
-          <div class="card z-index-2  ">
-            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-              <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                <div class="chart">
-                  <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <h6 class="mb-0 "> Users</h6>
-            </div>
-          </div>
+        <button type="submit" class="btn btn-facebook btn-block" name="send">Update price</button>
         </div>
-        <div class="col-lg-4 mt-4 mb-3">
-          <div class="card z-index-2 ">
-            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-              <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
-                <div class="chart">
-                  <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <h6 class="mb-0 ">Transactions</h6>
-            </div>
-          </div>
+        </form>
+      </div>
+      <div class="card shadow mb-6">
+        <form method="post">
+        <div class="form-group">
+            <label>Bonus amount</label>
+            <input class="form-control" name="price">
         </div>
+        <button type="submit" class="btn btn-facebook btn-block" name="set">Update</button>
+        </div>
+        </form>
+      </div>
       </div>
     </div>
   </main>
