@@ -69,7 +69,15 @@ if(isset($_POST['save'])){
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" href="transactions.php">
+          <a class="nav-link text-white " href="sub.php">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">receipt_long</i>
+            </div>
+            <span class="nav-link-text ms-1">Bonus</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white " href="transactions.php">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">table_view</i>
             </div>
@@ -77,11 +85,11 @@ if(isset($_POST['save'])){
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="withdraw.php">
+          <a class="nav-link text-white" href="payments.php">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">money</i>
+              <i class="material-icons opacity-10">table_view</i>
             </div>
-            <span class="nav-link-text ms-1">Withdraw</span>
+            <span class="nav-link-text ms-1">User payments</span>
           </a>
         </li>
         <li class="nav-item mt-3">

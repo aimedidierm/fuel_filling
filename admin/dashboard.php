@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 require '../php-includes/connect.php';
 require 'php-includes/check-login.php';
 
-$sql = "SELECT * FROM transactions";
+$sql = "SELECT * FROM momotr";
 $stmt = $db->prepare($sql);
 $stmt->execute();
 $trnumb=$stmt->rowCount();
@@ -20,11 +20,11 @@ $stmt = $db->prepare($sql);
 $stmt->execute();
 $sellers=$stmt->rowCount();
 
-$sql = "SELECT SUM(debit) FROM transactions";
+$sql = "SELECT SUM(amount) FROM momotr";
 $stmt = $db->prepare($sql);
 $stmt->execute();
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-$sales=$row['SUM(debit)'];
+$sales=$row['SUM(amount)'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,7 +80,7 @@ $sales=$row['SUM(debit)'];
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">table_view</i>
             </div>
-            <span class="nav-link-text ms-1">Transactions</span>
+            <span class="nav-link-text ms-1">User consume</span>
           </a>
         </li>
         <li class="nav-item">

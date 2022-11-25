@@ -91,6 +91,14 @@ if(isset($_POST['update'])){
             <span class="nav-link-text ms-1">Transactions</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="payments.php">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">table_view</i>
+            </div>
+            <span class="nav-link-text ms-1">User payments</span>
+          </a>
+        </li>
         <li class="nav-item mt-3">
           <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages</h6>
         </li>
@@ -128,17 +136,15 @@ if(isset($_POST['update'])){
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Client</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Card</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Amount</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Debit</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Credit</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">time</th>
                       <th class="text-secondary opacity-7"></th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
-                    $query = "SELECT c.user,c.amount,c.total,c.seller,c.time,u.id,u.names,u.card FROM consume AS c JOIN user AS u ON c.user = u.id WHERE seller= ?";
+                    $query = "SELECT t.debit,t.credit,t.seller,t.time FROM transactions AS t WHERE seller= ?";
                     $stmt = $db->prepare($query);
                     $stmt->execute(array($myid));
                     if ($stmt->rowCount()>0) {
@@ -147,26 +153,13 @@ if(isset($_POST['update'])){
                     ?>
                     <tr>
                       <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="../assets/img/user.jpg" class="avatar avatar-sm me-3 border-radius-lg" alt="user1">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm"><?php echo $rows['names'];?></h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0"><?php echo $rows['card'];?></p>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                      <p class="text-xs font-weight-bold mb-0"><?php echo $rows['amount'];?></p>
-                      </td>
-                      <td class="align-middle text-center">
-                      <p class="text-xs font-weight-bold mb-0"><?php echo $rows['total'];?></p>
+                        <p class="align-middle"><?php echo $rows['debit'];?></p>
                       </td>
                       <td class="align-middle">
-                      <p class="text-xs font-weight-bold mb-0"><?php echo $rows['time'];?></p>
+                      <p class="text-xs font-weight-bold mb-0"><?php echo $rows['credit'];?></p>
+                      </td>
+                      <td class="align-middle">
+                      <p class="align-middle text-center text-sm"><?php echo $rows['time'];?></p>
                       </td>
                     </tr>
                     <?php

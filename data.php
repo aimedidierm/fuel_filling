@@ -3,6 +3,13 @@ ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 error_reporting(E_ALL);
 require 'php-includes/connect.php';
+
+$query = "SELECT * FROM seller WHERE id=1";
+$stmt = $db->prepare($query);
+$stmt->execute();
+$rows = $stmt->fetch(PDO::FETCH_ASSOC);
+$balan=$rows['balance'];
+
 if(isset($_GET['money'])){
     $card=$_GET['card'];
     $amount=$_GET['money'];
@@ -26,7 +33,6 @@ if(isset($_GET['money'])){
         $camount=$rows['total'];
         if($cprice<=$camount){
             $total=$camount-$amount;
-            //update data
             $sql ="INSERT INTO consume (user,amount,total,seller) VALUES (?,?,?,'1')";
             $stm = $db->prepare($sql);
             if ($stm->execute(array($userid,$amount,$total))) {
@@ -87,7 +93,7 @@ if(isset($_GET['dmoney'])){
         $stmt->execute();
         $rows = $stmt->fetch(PDO::FETCH_ASSOC);
         $cprice=$rows['price'];
-        $amountml=$amount/$cprice;
+        $amountml=(1000/$cprice)*$amount;
         //get total
         $query = "SELECT * FROM consume WHERE user=? ORDER BY id DESC limit 1";
         $stmt = $db->prepare($query);
@@ -99,6 +105,10 @@ if(isset($_GET['dmoney'])){
         $sql ="INSERT INTO consume (user,amount,total,seller) VALUES (?,?,?,'1')";
         $stm = $db->prepare($sql);
         if ($stm->execute(array($userid,$amountml,$total))) {
+            $ubalance=$balan+$amount;
+            $sql ="UPDATE seller SET balance = ?";
+            $stm = $db->prepare($sql);
+            $stm->execute(array($ubalance));
             echo $data = array('outml' =>$amountml); 
             echo $response = json_encode($data);
         } else{
@@ -142,7 +152,18 @@ if(isset($_GET['phone'])){
     $sql ="INSERT INTO momotr (amount,number,user,status) VALUES (?,?,'0','pending')";
     $stm = $db->prepare($sql);
     if ($stm->execute(array($amount,$number))) {
-        echo $data = array('outml' =>$amount); 
+        $ubalance=$balan+$amount;
+        $sql ="UPDATE seller SET balance = ?";
+        $stm = $db->prepare($sql);
+        $stm->execute(array($ubalance));
+        //update data
+        $query = "SELECT * FROM price";
+        $stmt = $db->prepare($query);
+        $stmt->execute();
+        $rows = $stmt->fetch(PDO::FETCH_ASSOC);
+        $cprice=$rows['price'];
+        $amountml=(1000/$cprice)*$amount;
+        echo $data = array('outml' =>$amountml); 
         echo $response = json_encode($data);
     } else{
         echo $data = array('outml' =>'0'); 

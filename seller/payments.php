@@ -4,6 +4,27 @@ ini_set('display_startup_errors',1);
 error_reporting(E_ALL);
 require '../php-includes/connect.php';
 require 'php-includes/check-login.php';
+$query = "SELECT * FROM seller WHERE email= ? limit 1";
+$stmt = $db->prepare($query);
+$stmt->execute(array($_SESSION['email']));
+$rows = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($stmt->rowCount()>0) {
+    $myid=$rows['id'];
+    $balance=$rows['balance'];
+}
+if(isset($_POST['update'])){
+  $amount=$_POST['amount'];
+  if ($amount <= $balance){
+      $sql ="INSERT INTO pending_withdraw (seller, amount) VALUES (?,?)";
+      $stm = $db->prepare($sql);
+      if ($stm->execute(array($myid, $amount))) {
+          print "<script>alert('Your withdraw request send');window.location.assign('transactions.php')</script>";
+  
+      }
+  } else{
+      echo "<script>alert('Low balance');window.location.assign('transactions.php')</script>";
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +33,7 @@ require 'php-includes/check-login.php';
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>
-    Seller - bonus
+    Seller - payments
   </title>
   <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
@@ -38,7 +59,7 @@ require 'php-includes/check-login.php';
     <hr class="horizontal light mt-0 mb-2">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
       <ul class="navbar-nav">
-      <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link text-white" href="dashboard.php">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">dashboard</i>
@@ -55,7 +76,7 @@ require 'php-includes/check-login.php';
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white active bg-gradient-primary" href="sub.php">
+          <a class="nav-link text-white" href="sub.php">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">receipt_long</i>
             </div>
@@ -63,7 +84,7 @@ require 'php-includes/check-login.php';
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="transactions.php">
+          <a class="nav-link text-white" href="transactions.php">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">table_view</i>
             </div>
@@ -71,7 +92,7 @@ require 'php-includes/check-login.php';
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" href="payments.php">
+          <a class="nav-link text-white active bg-gradient-primary" href="payments.php">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">table_view</i>
             </div>
@@ -94,10 +115,20 @@ require 'php-includes/check-login.php';
 <div class="container-fluid py-4">
       <div class="row">
         <div class="col-12">
+          <h6>Request withdraw</h6>
+        <form method="post">
+            <div class="form-group">
+                <label>Amount:</label>
+                <input class="form-control" type="number" name="amount" required>
+            </div>
+            <div class="form-group">
+            <button type="submit" class="btn btn-success" name="update"> Request</button>
+            </div>
+        </form>
           <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
               <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                <h6 class="text-white text-capitalize ps-3">Customer consumes</h6>
+                <h6 class="text-white text-capitalize ps-3">Balance:<?php echo $balance;?>Rwf</h6>
               </div>
             </div>
             <div class="card-body px-0 pb-2">
@@ -105,56 +136,26 @@ require 'php-includes/check-login.php';
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Client</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Card</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Number</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Amount</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
-                      <th class="text-secondary opacity-7"></th>
+                      <th class="text-secondary opacity-7">Time</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
-                    $query = "SELECT * FROM seller WHERE email= ? limit 1";
-                    $stmt = $db->prepare($query);
-                    $stmt->execute(array($_SESSION['email']));
-                    $rows = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if ($stmt->rowCount()>0) {
-                        $myid=$rows['id'];
-                    }
-                    $query = "SELECT * FROM consume_allowed limit 1";
+                    $query = "SELECT * FROM momotr";
                     $stmt = $db->prepare($query);
                     $stmt->execute();
-                    $rows = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if ($stmt->rowCount()>0) {
-                        $co=$rows['consume'];
-                    }
-                    $query = "SELECT c.user,c.amount,c.total,c.seller,c.time,u.id,u.names,u.card FROM consume AS c JOIN user AS u ON c.user = u.id WHERE seller= ? AND c.total>=?";
-                    $stmt = $db->prepare($query);
-                    $stmt->execute(array($myid,$co));
                     if ($stmt->rowCount()>0) {
                         while ($rows = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         $count = 1;
                     ?>
                     <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="../assets/img/user.jpg" class="avatar avatar-sm me-3 border-radius-lg" alt="user1">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm"><?php echo $rows['names'];?></h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <p class="text-xs font-weight-bold mb-0"><?php echo $rows['card'];?></p>
-                      </td>
                       <td class="align-middle text-center text-sm">
-                      <p class="text-xs font-weight-bold mb-0"><?php echo $rows['amount'];?></p>
+                      <p class="text-xs font-weight-bold mb-0"><?php echo $rows['number'];?></p>
                       </td>
                       <td class="align-middle text-center">
-                      <p class="text-xs font-weight-bold mb-0"><?php echo $rows['total'];?></p>
+                      <p class="text-xs font-weight-bold mb-0"><?php echo $rows['amount'];?></p>
                       </td>
                       <td class="align-middle">
                       <p class="text-xs font-weight-bold mb-0"><?php echo $rows['time'];?></p>
