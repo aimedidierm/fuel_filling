@@ -1,7 +1,7 @@
 <?php
-ini_set('display_errors',1);
-ini_set('display_startup_errors',1);
-error_reporting(E_ALL);
+//ini_set('display_errors',1);
+//ini_set('display_startup_errors',1);
+//error_reporting(E_ALL);
 require 'php-includes/connect.php';
 
 $query = "SELECT * FROM seller WHERE id=1";
@@ -10,7 +10,7 @@ $stmt->execute();
 $rows = $stmt->fetch(PDO::FETCH_ASSOC);
 $balan=$rows['balance'];
 
-if(isset($_POST['money'])&&($_POST['card'])){
+if(isset($_POST['money'])){
     $card=$_POST['card'];
     $amount=$_POST['money'];
     $query = "SELECT * FROM user WHERE card = ? limit 1";
@@ -36,23 +36,23 @@ if(isset($_POST['money'])&&($_POST['card'])){
             $sql ="INSERT INTO consume (user,amount,total,seller) VALUES (?,?,?,'1')";
             $stm = $db->prepare($sql);
             if ($stm->execute(array($userid,$amount,$total))) {
-                echo $data = array('outml' =>$amount); 
+                echo $data = array("outml" =>$amount); 
                 echo $response = json_encode($data);
             } else{
-                echo $data = array('outml' =>'4'); 
+                echo $data = array("outml" =>"4"); 
                 echo $response = json_encode($data);
             }
         } else {
-            echo $data = array('outml' =>'3'); 
+            echo $data = array("outml" =>"3"); 
             echo $response = json_encode($data);
         }
     } else{
-        echo $data = array('outml' =>'2'); 
+        echo $data = array("outml" =>"2"); 
         echo $response = json_encode($data);
     }
 }
 
-if(isset($_POST['dmoney'])&&($_POST['card'])){
+if(isset($_POST['dmoney'])){
     $card=$_POST['card'];
     $amount=$_POST['dmoney'];
     $query = "SELECT * FROM user WHERE card = ? limit 1";
@@ -109,19 +109,19 @@ if(isset($_POST['dmoney'])&&($_POST['card'])){
             $sql ="UPDATE seller SET balance = ?";
             $stm = $db->prepare($sql);
             $stm->execute(array($ubalance));
-            echo $data = array('outml' =>$amountml); 
+            echo $data = array("outml" =>$amountml); 
             echo $response = json_encode($data);
         } else{
-            echo $data = array('outml' =>'1'); 
+            echo $data = array("outml" =>"1"); 
             echo $response = json_encode($data);
         }
     } else{
-        echo $data = array('outml' =>'1'); 
+        echo $data = array("outml" =>"1"); 
         echo $response = json_encode($data);
     }
 }
 
-if(isset($_POST['phone'])&&($_POST['amount'])){
+if(isset($_POST['phone'])){
     $number=$_POST['phone'];
     $amount=$_POST['amount'];
     $user="test";
@@ -163,10 +163,10 @@ if(isset($_POST['phone'])&&($_POST['amount'])){
         $rows = $stmt->fetch(PDO::FETCH_ASSOC);
         $cprice=$rows['price'];
         $amountml=(1000/$cprice)*$amount;
-        echo $data = array('outml' =>$amountml); 
+        echo $data = array("outml" =>$amountml); 
         echo $response = json_encode($data);
     } else{
-        echo $data = array('outml' =>'1'); 
+        echo $data = array("outml" =>"1"); 
         echo $response = json_encode($data);
     }
 }
