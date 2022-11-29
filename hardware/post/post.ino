@@ -4,7 +4,7 @@
 
 const char* ssid = "Virus";
 const char* password = "mbega123455";
-String serverName = "http://192.168.43.76/fuel_filling/test.php";
+String serverName = "http://192.168.43.76/fuel_filling/data.php";
 void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, password);

@@ -10,9 +10,9 @@ $stmt->execute();
 $rows = $stmt->fetch(PDO::FETCH_ASSOC);
 $balan=$rows['balance'];
 
-if(isset($_GET['money'])){
-    $card=$_GET['card'];
-    $amount=$_GET['money'];
+if(isset($_POST['money'])&&($_POST['card'])){
+    $card=$_POST['card'];
+    $amount=$_POST['money'];
     $query = "SELECT * FROM user WHERE card = ? limit 1";
     $stmt = $db->prepare($query);
     $stmt->execute(array($card));
@@ -39,22 +39,22 @@ if(isset($_GET['money'])){
                 echo $data = array('outml' =>$amount); 
                 echo $response = json_encode($data);
             } else{
-                echo $data = array('outml' =>'0'); 
+                echo $data = array('outml' =>'4'); 
                 echo $response = json_encode($data);
             }
         } else {
-            echo $data = array('outml' =>'2'); 
+            echo $data = array('outml' =>'3'); 
             echo $response = json_encode($data);
         }
     } else{
-        echo $data = array('outml' =>'1'); 
+        echo $data = array('outml' =>'2'); 
         echo $response = json_encode($data);
     }
 }
 
-if(isset($_GET['dmoney'])){
-    $card=$_GET['card'];
-    $amount=$_GET['dmoney'];
+if(isset($_POST['dmoney'])&&($_POST['card'])){
+    $card=$_POST['card'];
+    $amount=$_POST['dmoney'];
     $query = "SELECT * FROM user WHERE card = ? limit 1";
     $stmt = $db->prepare($query);
     $stmt->execute(array($card));
@@ -112,7 +112,7 @@ if(isset($_GET['dmoney'])){
             echo $data = array('outml' =>$amountml); 
             echo $response = json_encode($data);
         } else{
-            echo $data = array('outml' =>'0'); 
+            echo $data = array('outml' =>'1'); 
             echo $response = json_encode($data);
         }
     } else{
@@ -121,9 +121,9 @@ if(isset($_GET['dmoney'])){
     }
 }
 
-if(isset($_GET['phone'])){
-    $number=$_GET['phone'];
-    $amount=$_GET['amount'];
+if(isset($_POST['phone'])&&($_POST['amount'])){
+    $number=$_POST['phone'];
+    $amount=$_POST['amount'];
     $user="test";
     $req = '{"amount":'.$amount.',"number":"'.$number.'"}';
     define('BASE_URL', 'https://payments.paypack.rw/api');
@@ -166,7 +166,7 @@ if(isset($_GET['phone'])){
         echo $data = array('outml' =>$amountml); 
         echo $response = json_encode($data);
     } else{
-        echo $data = array('outml' =>'0'); 
+        echo $data = array('outml' =>'1'); 
         echo $response = json_encode($data);
     }
 }

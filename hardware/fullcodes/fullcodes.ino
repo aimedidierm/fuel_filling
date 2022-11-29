@@ -142,14 +142,14 @@ void momo(){
         lcd.clear();
         lcd.print("Loading");
         //dismoney[12]=momomoney;
-        Serial.println((String)"?phone="+newNum+"&money="+momomoney);
+        Serial.println((String)"phone="+newNum+"&amount="+momomoney);
         while(k==0){
           if (Serial.available() > 0) {
       DynamicJsonBuffer jsonBuffer;
       JsonObject& root = jsonBuffer.parseObject(Serial.readStringUntil('\n'));
       if (root["outml"]) {
       int outml = root["outml"];
-      if(outml==0){
+      if(outml==1){
         lowbalance();
         } else{
           drinkvolume=outml;
@@ -260,7 +260,7 @@ void paydirect(){
     lcd.print("Loading");
     delay(2000);
     //dismoney[12]=directmoney;
-    Serial.println((String)"?card="+card+"&dmoney="+directmoney);
+    Serial.println((String)"card="+card+"&dmoney="+directmoney);
     while(k==0){
       if (Serial.available() > 0) {
         //kwakira data zivuye kuri node mcu na server
@@ -268,7 +268,7 @@ void paydirect(){
       JsonObject& root = jsonBuffer.parseObject(Serial.readStringUntil('\n'));
       if (root["outml"]) {
       int outml = root["outml"];
-      if(outml==0){
+      if(outml==1){
         lowbalance();
         } else{
           drinkvolume=outml;
@@ -301,7 +301,7 @@ void bonus(){
     lcd.clear();
     lcd.print("Loading");
     dismoney[12]="0";
-    Serial.println((String)"?card='"+card+"'&money="+bonusamount);
+    Serial.println((String)"card='"+card+"'&money="+bonusamount);
     while(k==0){
       if (Serial.available() > 0) {
         //kwakira data zivuye kuri node mcu na server
@@ -309,9 +309,13 @@ void bonus(){
       JsonObject& root = jsonBuffer.parseObject(Serial.readStringUntil('\n'));
       if (root["outml"]) {
       int outml = root["outml"];
-      if(outml==0){
+      if(outml==1){
         lowbalance();
-        } else{
+        } else if(outml==2){
+          usern();
+          } else if(outml==3){
+          call();
+          } else{
           drinkvolume=outml;
           drinkout();
           }
@@ -328,6 +332,30 @@ void lowbalance(){
   lcd.print("Insufficient");
   lcd.setCursor(0,1);
   lcd.print("funds");
+  digitalWrite(red,HIGH);
+  tone(buzzer, 1000, 1000);
+  delay(3000);
+  digitalWrite(red,LOW);
+  lcd.clear();
+  resetFunc();
+}
+void usern(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("User not");
+  lcd.setCursor(0,1);
+  lcd.print("found");
+  digitalWrite(red,HIGH);
+  tone(buzzer, 1000, 1000);
+  delay(3000);
+  digitalWrite(red,LOW);
+  lcd.clear();
+  resetFunc();
+}
+void call(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Not yet allowed");
   digitalWrite(red,HIGH);
   tone(buzzer, 1000, 1000);
   delay(3000);
