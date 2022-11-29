@@ -129,7 +129,7 @@ require 'php-includes/check-login.php';
                     if ($stmt->rowCount()>0) {
                         $co=$rows['consume'];
                     }
-                    $query = "SELECT c.user,c.amount,c.total,c.seller,c.time,u.id,u.names,u.card FROM consume AS c JOIN user AS u ON c.user = u.id WHERE seller= ? AND c.total>=?";
+                    $query = "SELECT c.user,c.amount,c.total,c.seller,c.time,u.id,u.names,u.card FROM consume AS c JOIN user AS u ON c.user = u.id WHERE seller= ? AND c.total>=? limit 1";
                     $stmt = $db->prepare($query);
                     $stmt->execute(array($myid,$co));
                     if ($stmt->rowCount()>0) {
