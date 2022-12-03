@@ -52,7 +52,7 @@ void setup()
   lcd.init();                      // initialize the lcd 
   lcd.init();
   SPI.begin();  
-  Serial.begin(115200);   // Initiate a serial communication
+  Serial.begin(9600);   // Initiate a serial communication
   SPI.begin();      // Initiate  SPI bus
   mfrc522.PCD_Init();   // Initiate MFRC522
   pinMode(Valve , OUTPUT);
