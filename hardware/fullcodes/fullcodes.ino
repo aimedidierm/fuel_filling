@@ -46,6 +46,7 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 int drink=0,drinkvolume=0,phone=0,amount=0,kwiyaboneshaamount=0,kwishyuraamount=0;
 String card;
+String data="";
 //int outml=0;
 void setup() 
 {
@@ -143,15 +144,18 @@ void momo(){
         lcd.print("Loading");
         //dismoney[12]=momomoney;
         Serial.println((String)"phone="+newNum+"&amount="+momomoney);
+        Serial.println(data);
         while(k==0){
-          if (Serial.available() > 0) {
+        if (Serial.available() > 0) {
+        data = Serial.readStringUntil('\n');
+      Serial.println(data);
       DynamicJsonBuffer jsonBuffer;
-      JsonObject& root = jsonBuffer.parseObject(Serial.readStringUntil('\n'));
-      if (root["outml"]) {
-      int outml = root["outml"];
+      JsonObject& root = jsonBuffer.parseObject(data);
+      if (root["c"]) {
+      int outml = root["c"];
       if(outml==1){
         lowbalance();
-        } else{
+        } else {
           drinkvolume=outml;
           drinkout();
           }
@@ -159,6 +163,10 @@ void momo(){
       }
           }
         }
+        else if (key=='*')
+    {
+       //resetFunc();
+    }
         delay(100);
         }
           }
@@ -261,13 +269,14 @@ void paydirect(){
     delay(2000);
     //dismoney[12]=directmoney;
     Serial.println((String)"card="+card+"&dmoney="+directmoney);
+    Serial.println(data);
     while(k==0){
       if (Serial.available() > 0) {
-        //kwakira data zivuye kuri node mcu na server
+      data = Serial.readStringUntil('\n');
       DynamicJsonBuffer jsonBuffer;
-      JsonObject& root = jsonBuffer.parseObject(Serial.readStringUntil('\n'));
-      if (root["outml"]) {
-      int outml = root["outml"];
+      JsonObject& root = jsonBuffer.parseObject(data);
+      if (root["cstatus"]) {
+      int outml = root["cstatus"];
       if(outml==1){
         lowbalance();
         } else{
@@ -277,6 +286,10 @@ void paydirect(){
       }
       }
       }
+    }
+    else if (key=='*')
+    {
+       resetFunc();
     }
     delay(100);
     }
@@ -302,13 +315,14 @@ void bonus(){
     lcd.print("Loading");
     dismoney[12]="0";
     Serial.println((String)"card='"+card+"'&money="+bonusamount);
+    Serial.println(data);
     while(k==0){
       if (Serial.available() > 0) {
-        //kwakira data zivuye kuri node mcu na server
+      data = Serial.readStringUntil('\n');
       DynamicJsonBuffer jsonBuffer;
-      JsonObject& root = jsonBuffer.parseObject(Serial.readStringUntil('\n'));
-      if (root["outml"]) {
-      int outml = root["outml"];
+      JsonObject& root = jsonBuffer.parseObject(data);
+      if (root["cstatus"]) {
+      int outml = root["cstatus"];
       if(outml==1){
         lowbalance();
         } else if(outml==2){
@@ -322,6 +336,10 @@ void bonus(){
       }
       }
       }
+    }
+    else if (key=='*')
+    {
+       resetFunc();
     }
     delay(100);
     }
