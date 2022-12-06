@@ -269,10 +269,10 @@ void paydirect(){
     delay(2000);
     //dismoney[12]=directmoney;
     Serial.println((String)"card="+card+"&dmoney="+directmoney);
-    Serial.println(data);
     while(k==0){
       if (Serial.available() > 0) {
       data = Serial.readStringUntil('\n');
+      Serial.println(data);
       DynamicJsonBuffer jsonBuffer;
       JsonObject& root = jsonBuffer.parseObject(data);
       if (root["cstatus"]) {
@@ -315,10 +315,10 @@ void bonus(){
     lcd.print("Loading");
     dismoney[12]="0";
     Serial.println((String)"card='"+card+"'&money="+bonusamount);
-    Serial.println(data);
     while(k==0){
       if (Serial.available() > 0) {
       data = Serial.readStringUntil('\n');
+      Serial.println(data);
       DynamicJsonBuffer jsonBuffer;
       JsonObject& root = jsonBuffer.parseObject(data);
       if (root["cstatus"]) {
