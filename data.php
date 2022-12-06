@@ -125,7 +125,7 @@ if(isset($_POST['dmoney'])){
 if(isset($_POST['phone'])){
     $number=$_POST['phone'];
     $amount=$_POST['amount'];
-    /*$user="test";
+    $user="test";
     $req = '{"amount":'.$amount.',"number":"'.$number.'"}';
     define('BASE_URL', 'https://payments.paypack.rw/api');
     
@@ -149,7 +149,7 @@ if(isset($_POST['phone'])){
     
     $response = curl_exec($curl);
     
-    curl_close($curl);*/
+    curl_close($curl);
     $sql ="INSERT INTO momotr (amount,number,user,status) VALUES (?,?,'0','pending')";
     $stm = $db->prepare($sql);
     if ($stm->execute(array($amount,$number))) {
