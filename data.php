@@ -9,6 +9,7 @@ $stmt = $db->prepare($query);
 $stmt->execute();
 $rows = $stmt->fetch(PDO::FETCH_ASSOC);
 $balan=$rows['balance'];
+$sellerid=$rows['id'];
 if(isset($_POST['money'])){
     //$card=$_POST['card'];
     $card="13 13 BD AB";

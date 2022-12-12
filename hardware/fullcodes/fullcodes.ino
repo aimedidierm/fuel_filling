@@ -9,7 +9,7 @@
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
 
 int Interrupt = 0;
-int sensorPin       = 2;
+int sensorPin = 2;
 #define Valve A3
 #define red A1
 #define buzzer A2
@@ -144,7 +144,6 @@ void momo(){
         lcd.print("Loading");
         //dismoney[12]=momomoney;
         Serial.println((String)"phone="+newNum+"&amount="+momomoney);
-        Serial.println(data);
         while(k==0){
         if (Serial.available() > 0) {
         data = Serial.readStringUntil('\n');
