@@ -44,6 +44,7 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 int drink = 0, drinkvolume = 0, phone = 0, amount = 0, kwiyaboneshaamount = 0, kwishyuraamount = 0;
 String card;
+String cardType = "card3";
 String data = "";
 
 void setup() 
@@ -70,7 +71,108 @@ void setup()
 
 void loop() 
 {
-  readcard();
+  lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Choose payment");
+    lcd.setCursor(0, 1);
+    lcd.print("Method");
+    delay(3000);
+    paymentmethod();
+}
+
+void paymentmethod() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("1. Mobile money");
+    lcd.setCursor(0, 1);
+    lcd.print("2. Smart card");
+    int key = keypad.getKey();
+    if (key == '1') {
+        momo();
+    }
+    if (key == '2') {
+        readcard();
+    }
+    delay(100);
+    paymentmethod();
+}
+
+void momo() {
+    int i = 0, j = 0, k = 0;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Please enter");
+    lcd.setCursor(0, 1);
+    lcd.print("mobile number");
+    delay(2000);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Mobile number");
+    
+    while (true) {
+        lcd.setCursor(0, 1);
+        int key = keypad.getKey();
+        if (key != NO_KEY && key != '#' && key != '*') {
+            newNum[j] = key;
+            newNum[j + 1] = '\0';   
+            j++;
+            lcd.setCursor(0, 1);
+            lcd.print(newNum);
+        }
+        if (key == '#' && j > 0) {
+            j = 0;
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Enter money:");
+            lcd.setCursor(0, 1);
+            
+            while (true) {
+                int key = keypad.getKey();
+                if (key != NO_KEY && key != '#' && key != '*') {
+                    momomoney[j] = key;
+                    momomoney[j + 1] = '\0';   
+                    j++;
+                    lcd.setCursor(0, 1);
+                    lcd.print(momomoney);
+                }
+                if (key == '#' && j > 0) {
+                    j = 0;
+                    lcd.clear();
+                    lcd.print("Loading");
+                    // Serial.println((String)"phone=" + newNum + "&amount=" + momomoney);
+                    // String request = "phone,phone=" + newNum + "," + momomoney + "\n";
+                    Serial.print((String)"phone,phone=" + newNum + "," + momomoney + "\n");
+                    while (k == 0) {
+                        if (Serial.available() > 0) {
+                            data = Serial.readStringUntil('\n');
+                            Serial.println(data);
+                            
+                            DynamicJsonDocument doc(1024);
+                            DeserializationError error = deserializeJson(doc, data);
+                            if (error) {
+                                Serial.print(F("deserializeJson() failed: "));
+                                Serial.println(error.f_str());
+                                return;
+                            }
+                            
+                            if (doc.containsKey("cstatus")) {
+                                int outml = doc["cstatus"];
+                                if (outml == 1) {
+                                    lowbalance();
+                                } else {
+                                    drinkvolume = outml;
+                                    drinkout();
+                                }
+                            }
+                        }
+                    }
+                } else if (key == '*') {
+                    resetFunc();
+                }
+                delay(100);
+            }
+        }
+    }
 }
 
 void drinkout() {
@@ -120,6 +222,12 @@ void readcard() {
     }
     content.toUpperCase();
     card = content.substring(1);
+
+    if(card == "D3 9C 72 42"){
+        cardType = "card1";
+    } else {
+        cardType = "card2";
+    }
     
     while (true) {
         lcd.clear();
@@ -158,32 +266,32 @@ void paydirect() {
             lcd.clear();
             lcd.print("Loading");
             delay(2000);
-            Serial.println((String)"{'card'='" + card + "','dmoney'=" + directmoney + "}");
-            drinkvolume = 300;
-                            drinkout();
-            // while (k == 0) {
-            //     if (Serial.available() > 0) {
-            //         data = Serial.readStringUntil('\n');
-            //         Serial.println(data);
-            //         StaticJsonDocument<2048> doc;
-            //         DeserializationError error = deserializeJson(doc, data);
-            //         if (error) {
-            //             Serial.print(F("deserializeJson() failed: "));
-            //             Serial.println(error.f_str());
-            //             return;
-            //         }
+            // Serial.println((String)"{'card'='" + card + "','dmoney'=" + directmoney + "}");
+            String request = "dmoney," + cardType + "," + directmoney + "\n";
+            Serial.print(request);
+            while (k == 0) {
+                if (Serial.available() > 0) {
+                    data = Serial.readStringUntil('\n');
+                    Serial.println(data);
+                    StaticJsonDocument<2048> doc;
+                    DeserializationError error = deserializeJson(doc, data);
+                    if (error) {
+                        Serial.print(F("deserializeJson() failed: "));
+                        Serial.println(error.f_str());
+                        return;
+                    }
                     
-            //         if (doc.containsKey("cstatus")) {
-            //             int outml = doc["cstatus"];
-            //             if (outml == 3) {
-            //                 unknownError();
-            //             } else {
-            //                 drinkvolume = outml;
-            //                 drinkout();
-            //             }
-            //         }
-            //     }
-            // }
+                    if (doc.containsKey("cstatus")) {
+                        int outml = doc["cstatus"];
+                        if (outml == 3) {
+                            unknownError();
+                        } else {
+                            drinkvolume = outml;
+                            drinkout();
+                        }
+                    }
+                }
+            }
         } else if (key == '*') {
             resetFunc();
         }
@@ -210,7 +318,9 @@ void bonus() {
             j = 0;
             lcd.clear();
             lcd.print("Loading");
-            Serial.println((String)"{'card'='" + card + "','money'=" + bonusamount + "}");
+            // Serial.println((String)"{'card'='" + card + "','money'=" + bonusamount + "}");
+            String request = "money," + cardType + "," + bonusamount + "\n";
+            Serial.print(request);
             
             while (k == 0) {
                 if (Serial.available() > 0) {

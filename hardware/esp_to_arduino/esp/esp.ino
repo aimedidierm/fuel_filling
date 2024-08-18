@@ -1,8 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 
-const char* ssid = "Xi-TeKLTD-2G";
-const char* password = "xitek@1998";
+const char* ssid = "EGATEEMIFI_CCDC";
+const char* password = "30361568";
 
 WiFiClient wifiClient;
 
@@ -21,21 +21,23 @@ void setup() {
 void loop() {
   if (Serial.available()) {
     String requestType = Serial.readStringUntil(',');
-    String card = Serial.readStringUntil(',');
+    // String card = Serial.readStringUntil(',');
+    String card = "card1";
     String amount = Serial.readStringUntil('\n');
 
     String url;
-    if (requestType == "money") {
-      // url = "http://yourwebsite.com/path/to/your/script.php?card=" + card + "&money=" + amount;
-      url = "http://192.168.1.82/rfid_card_based_fuel_station/data.php?card=" + card + "&money=" + amount;
-    } else if (requestType == "dmoney") {
-      // url = "http://yourwebsite.com/path/to/your/script.php?card=" + card + "&dmoney=" + amount;
-      url = "http://192.168.1.82/rfid_card_based_fuel_station/data.php?card=" + card + "&dmoney=" + amount;
+    if(card == "card1") {
+      if (requestType == "money") {
+        url = "http://192.168.1.82/rfid_card_based_fuel_station/card1.php?money=" + amount;
+      } else if (requestType == "dmoney") {
+        url = "http://192.168.1.82/rfid_card_based_fuel_station/card1.php?dmoney=" + amount;
+      } else {
+        Serial.println("Invalid request type");
+        return;
+      }
     } else {
-      Serial.println("Invalid request type");
-      return;
+      
     }
-
     sendHTTPRequest(url);
   }
 }
