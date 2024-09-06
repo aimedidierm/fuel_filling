@@ -1,71 +1,78 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 
-const char* ssid = "EGATEEMIFI_CCDC";
-const char* password = "30361568";
+const char* ssid = "Balance";
+const char* password = "balance1234";
+const char* serverName = "http://192.168.43.83/rfid_card_based_fuel_station/data.php";
 
-WiFiClient wifiClient;
+WiFiClient client;
 
 void setup() {
-  Serial.begin(9600);  // Communication with Arduino
-  WiFi.begin(ssid, password);
+  Serial.begin(9600);
   
-  // Wait for connection
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to Wi-Fi");
+  
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connecting to Wi-Fi...");
+    Serial.print(".");
   }
-  Serial.println("Connected to Wi-Fi");
+  
+  Serial.println("\nConnected to Wi-Fi");
 }
 
 void loop() {
+  // Prepare the GET request URL with query parameters
+  // float money = 23.5;
+  // int card = 1;
+  // String url = String(serverName) + "?money=" + String(money) + "&card=" + String(card);
+  // sendHTTPRequest(url);
   if (Serial.available()) {
     String requestType = Serial.readStringUntil(',');
-    String card = Serial.readStringUntil(',');
+    String userStuff = Serial.readStringUntil(','); //this is phone number or card ID
     String amount = Serial.readStringUntil('\n');
-
     String url;
-
-    if(card == "card1"){
-      if (requestType == "money") {
-        url = "http://192.168.1.103/fuel_filling/card1.php?money=" + amount;
-      } else if (requestType == "dmoney") {
-        url = "http://192.168.1.103/fuel_filling/card1.php?dmoney=" + amount;
-      } else {
-        Serial.println("Invalid request type");
-        return;
-      }
-    } else if(card == "card2") {
-      if (requestType == "money") {
-        url = "http://192.168.1.103/fuel_filling/card2.php?money=" + amount;
-      } else if (requestType == "dmoney") {
-        url = "http://192.168.1.103/fuel_filling/card2.php?dmoney=" + amount;
-      } else {
-        Serial.println("Invalid request type");
-        return;
-      }
+    if (requestType == "card") {
+      //request EX
+      //card,abc,200
+      url = String(serverName) + "?money=" + String(amount) + "&card=" + String(userStuff);
+    } else if(requestType == "dcard"){
+      //request EX
+      //dcard,abc,200
+      url = String(serverName) + "?dmoney=" + String(amount) + "&card=" + String(userStuff);
+    } else if (requestType == "phone") {
+      //request EX
+      //phone,0788750979,200
+      url = String(serverName) + "?money=" + String(amount) + "&phone=" + String(userStuff);
     } else {
-      url = "http://192.168.1.103/fuel_filling/phone.php?money=" + amount + "&phone=" + requestType;
+      Serial.println("Invalid request type");
+      return;
     }
-
     sendHTTPRequest(url);
   }
+  delay(1000);
 }
 
 void sendHTTPRequest(String url) {
-  if (WiFi.status() == WL_CONNECTED) {
+  if(WiFi.status() == WL_CONNECTED){
+    
     HTTPClient http;
-    http.begin(wifiClient, url);  // Use the updated API call with WiFiClient
-
-    int httpCode = http.GET();
-
-    if (httpCode > 0) {
-      String payload = http.getString();
-      Serial.println(payload); // Send the response back to the Arduino
+    
+    // Use the WiFiClient with the full URL containing the GET parameters
+    http.begin(client, url);  // Specify the full URL for the GET request
+    
+    // Send the GET request
+    int httpResponseCode = http.GET();
+    
+    // Print the response and status code
+    if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println(response);
     } else {
-      Serial.println("Error on HTTP request");
+      Serial.println("Error in GET request. HTTP Response code: " + String(httpResponseCode));
     }
-
+    
     http.end();
   }
 }
