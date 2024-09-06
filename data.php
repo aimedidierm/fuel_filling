@@ -183,7 +183,7 @@ function getToken()
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => '{"client_id": "5b3441b4-0b8d-11ef-b8db-deade826d28d","client_secret": "56b95e58e5b28e316e9f30cb66c95511da39a3ee5e6b4b0d3255bfef95601890afd80709"}',
+        CURLOPT_POSTFIELDS => '{"client_id": "XXX","client_secret": "XXX"}',
         CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
     ));
 
